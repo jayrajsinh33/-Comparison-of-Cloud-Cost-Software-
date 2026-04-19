@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>EcoCloud | Sustainable Energy Cost Optimization System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0F172A;
+      color: #F1F5F9;
+      overflow-x: hidden;
+    }
+
+    /* ========== MODERN NAVBAR WITH HAMBURGER ========== */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      padding: 1rem 5%;
+      border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #22C55E, #3B82F6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-decoration: none;
+    }
+
+    .logo i {
+      background: none;
+      -webkit-background-clip: unset;
+      color: #22C55E;
+      margin-right: 8px;
+    }
+
+    /* Desktop Navigation */
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: #CBD5E1;
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.3s;
+      position: relative;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: #22C55E;
+    }
+
+    .nav-links a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, #22C55E, #3B82F6);
+      border-radius: 2px;
+    }
+
+    /* Hamburger Menu Button */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 6px;
+      z-index: 1001;
+    }
+
+    .hamburger span {
+      width: 30px;
+      height: 3px;
+      background: #22C55E;
+      border-radius: 3px;
+      transition: 0.3s;
+    }
+
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(45deg) translate(8px, 8px);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(8px, -8px);
+    }
+
+    /* Mobile Menu */
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 80%;
+      max-width: 320px;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.98);
+      backdrop-filter: blur(20px);
+      z-index: 999;
+      padding: 80px 2rem 2rem;
+      transition: 0.3s ease;
+      border-left: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .mobile-menu.active {
+      right: 0;
+    }
+
+    .mobile-menu a {
+      display: block;
+      color: #CBD5E1;
+      text-decoration: none;
+      padding: 1rem 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+      transition: 0.3s;
+    }
+
+    .mobile-menu a:hover, .mobile-menu a.active {
+      color: #22C55E;
+      padding-left: 10px;
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 998;
+      display: none;
+    }
+
+    .menu-overlay.active {
+      display: block;
+    }
+
+    /* Scroll to top button */
+    .scroll-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #22C55E, #3B82F6);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.3s;
+      z-index: 99;
+      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+    }
+
+    .scroll-top.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .scroll-top:hover {
+      transform: translateY(-5px);
+    }
+
+    /* ========== LOADER ========== */
+    .loader-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0F172A;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 1s ease;
+    }
+    .loader-logo {
+      font-size: 4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #22C55E, #3B82F6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: fadeScaleGlow 2.2s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+    }
+    @keyframes fadeScaleGlow {
+      0% { opacity: 0; transform: scale(0.7); letter-spacing: 8px; }
+      40% { opacity: 1; transform: scale(1.1); text-shadow: 0 0 25px #22C55E;}
+      100% { opacity: 0; transform: scale(1.2); visibility: hidden; display: none; }
+    }
+
+    .main-content {
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    /* ========== COMMON STYLES ========== */
+    .gradient-text {
+      background: linear-gradient(120deg, #22C55E, #3B82F6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .btn-glow {
+      background: linear-gradient(95deg, #22C55E, #3B82F6);
+      border: none;
+      padding: 12px 32px;
+      border-radius: 40px;
+      font-weight: 600;
+      color: white;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 8px rgba(34,197,94,0.4);
+      cursor: pointer;
+    }
+    
+    .btn-glow:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px -5px #22C55E80;
+    }
+    
+    .card-hover {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(2px);
+      border-radius: 24px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(34,197,94,0.2);
+      padding: 2rem;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-8px);
+      border-color: #22C55E;
+      box-shadow: 0 20px 35px -12px #22C55E40;
+      background: rgba(30, 41, 59, 0.95);
+    }
+    
+    section {
+      padding: 100px 5% 80px;
+      scroll-margin-top: 80px;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      position: relative;
+      display: inline-block;
+    }
+    
+    h2:after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 70px;
+      height: 4px;
+      background: linear-gradient(90deg, #22C55E, #3B82F6);
+      border-radius: 4px;
+    }
+    
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #1E293B;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    
+    .comparison-table th, .comparison-table td {
+      padding: 1rem;
+      text-align: center;
+      border-bottom: 1px solid #334155;
+    }
+    
+    .comparison-table th {
+      background: #0F172A;
+      color: #22C55E;
+      font-weight: 600;
+    }
+    
+    .chart-container {
+      background: #1E293B;
+      border-radius: 28px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
+    
+    @media (max-width: 768px) {
+      section { padding: 80px 5% 60px; scroll-margin-top: 70px; }
+      h2 { font-size: 1.8rem; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .grid-3, .grid-4 { gap: 1rem; }
+      .card-hover { padding: 1.2rem; }
+    }
+    
+    footer {
+      background: #020617;
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    input, select {
+      background: #1E293B;
+      border: 1px solid #334155;
+      padding: 12px 16px;
+      border-radius: 40px;
+      color: white;
+      outline: none;
+      width: 100%;
+      margin-top: 5px;
+    }
+    
+    label {
+      font-weight: 600;
+    }
+    
+    .currency-badge {
+      background: #FACC15;
+      color: #0F172A;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    
+    .currency-badge:hover {
+      background: #22C55E;
+      color: white;
+    }
+    
+    .marketplace-card {
+      background: linear-gradient(135deg, #1E293B, #0F172A);
+      border-radius: 20px;
+      padding: 1.2rem;
+      text-align: center;
+      border: 1px solid #22C55E30;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+    
+    .marketplace-card:hover {
+      transform: scale(1.03);
+      border-color: #22C55E;
+    }
+    
+    .info-badge {
+      background: rgba(34, 197, 94, 0.15);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: #22C55E;
+    }
+    
+    /* Welcome Section */
+    .welcome-card {
+      background: linear-gradient(135deg, #1E293B, #0F172A);
+      border-radius: 28px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid #22C55E30;
+    }
+  </style>
+</head>
+<body>
+
+<div class="loader-wrapper" id="loader">
+  <div class="loader-logo">🌿 EcoCloud</div>
+</div>
+
+<!-- Modern Navbar with Hamburger -->
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="#" class="logo"><i class="fas fa-leaf"></i> EcoCloud</a>
+    <div class="nav-links">
+      <a href="#home" class="active">🏠 Home</a>
+      <a href="#comparison">📊 Compare</a>
+      <a href="#calculator">💰 Calculator</a>
+      <a href="#dashboard">📡 Dashboard</a>
+      <a href="#shop">🛒 Shop</a>
+      <a href="#carbon">🌱 Carbon</a>
+    </div>
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#home" class="active">🏠 Home</a>
+  <a href="#comparison">📊 Cloud Comparison</a>
+  <a href="#calculator">💰 Cost Calculator</a>
+  <a href="#dashboard">📡 Real Dashboard</a>
+  <a href="#shop">🛒 Compare & Shop</a>
+  <a href="#smart">🤖 AI Features</a>
+  <a href="#iot">🌤️ IoT Energy</a>
+  <a href="#carbon">🌱 Carbon Tracker</a>
+  <a href="#cases">📚 Case Studies</a>
+  <a href="#future">🚀 Future Scope</a>
+</div>
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<div class="main-content" id="mainContent" style="opacity:0">
+  
+  <!-- Welcome / Hero Section -->
+  <section id="home">
+    <div class="container">
+      <div class="welcome-card" style="text-align: center;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">🌿⚡</div>
+        <h1 style="font-size: 3rem; font-weight:800; margin-bottom: 1rem;">Smart Sustainable Energy <br> with <span class="gradient-text">Cloud Optimization</span></h1>
+        <p style="font-size: 1.2rem; margin-bottom: 1rem; color:#CBD5E1;">AI-driven cost reduction • Real‑time analytics • Green computing</p>
+        <div class="flex-between" style="justify-content: center; gap: 1rem; flex-wrap: wrap;">
+          <button class="btn-glow" id="exploreBtn">Explore Now <i class="fas fa-arrow-right"></i></button>
+          <button class="btn-glow" id="currencyToggle" style="background: linear-gradient(95deg, #FACC15, #EAB308);">💱 USD ↔ INR</button>
+        </div>
+      </div>
+      
+      <!-- Feature Cards -->
+      <div class="grid-3">
+        <div class="card-hover"><i class="fas fa-chart-line" style="font-size: 2.5rem; color:#22C55E;"></i><h3 style="margin:1rem 0">Cost Optimization</h3><p>ML-driven cloud spend reduction up to 34%.</p><span class="info-badge">AI Powered</span></div>
+        <div class="card-hover"><i class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color:#3B82F6;"></i><h3 style="margin:1rem 0">Cloud Comparison</h3><p>AWS, Azure, GCP – realtime pricing.</p><span class="info-badge">Live Data</span></div>
+        <div class="card-hover"><i class="fas fa-microchip" style="font-size: 2.5rem; color:#FACC15;"></i><h3 style="margin:1rem 0">Smart Analytics</h3><p>Predictive energy & carbon insights.</p><span class="info-badge">Predictive</span></div>
+      </div>
+    </div>
+    <canvas id="particleCanvas" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: -1;"></canvas>
+  </section>
+
+  <!-- CLOUD COMPARISON -->
+  <section id="comparison">
+    <div class="container">
+      <h2>⚡ Cloud Provider Comparison</h2>
+      <p style="margin-bottom: 1rem; color:#94A3B8;">Compare AWS, Azure, and GCP pricing and performance metrics</p>
+      <div class="flex-between" style="margin-bottom: 20px;">
+        <div>
+          <button id="filterCheapest" class="btn-glow" style="padding:8px 20px;">💰 Cheapest</button>
+          <button id="filterBestPerf" class="btn-glow" style="padding:8px 20px; margin-left:10px;">⚡ Best Performance</button>
+        </div>
+        <div><span class="info-badge"><i class="fas fa-chart-simple"></i> <span id="currencySymbol">$</span> Real-time pricing</span></div>
+      </div>
+      <table class="comparison-table" id="providerTable">
+        <thead><tr><th>Provider</th><th>Compute (<span id="computeCurr">$</span>/hr)</th><th>Storage (<span id="storageCurr">$</span>/GB/mo)</th><th>Scalability</th><th>Performance</th><th>Sustainability</th></tr></thead>
+        <tbody id="tableBody"></tbody>
+       </table>
+      <div class="chart-container"><canvas id="priceChart"></canvas></div>
+      <div class="chart-container"><canvas id="performanceChart"></canvas></div>
+    </div>
+  </section>
+
+  <!-- COST CALCULATOR -->
+  <section id="calculator">
+    <div class="container">
+      <h2>💰 Cost Calculator</h2>
+      <p style="margin-bottom: 1rem; color:#94A3B8;">Enter your usage to get AI-powered cost optimization recommendations</p>
+      <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+        <div style="flex:1; background:#1E293B; border-radius: 28px; padding: 1.5rem;">
+          <label><i class="fas fa-database"></i> Storage (GB)</label>
+          <input type="number" id="storageInput" value="500" step="100">
+          <br><br>
+          <label><i class="fas fa-microchip"></i> Compute Hours (monthly)</label>
+          <input type="number" id="computeInput" value="300" step="50">
+          <br><br>
+          <button id="calcBtn" class="btn-glow">Calculate Estimate <i class="fas fa-calculator"></i></button>
+          <p id="costResult" style="margin-top:20px; font-weight:bold;"></p>
+          <p id="bestProviderSuggestion" style="color:#22C55E;"></p>
+          <p id="inrConversion" style="color:#FACC15; margin-top:10px; font-size:0.9rem;"></p>
+        </div>
+        <div style="flex:1; background:#1E293B; border-radius: 28px; padding: 1.5rem;">
+          <h3><i class="fas fa-robot"></i> AI Recommendation</h3>
+          <p id="aiMsg" style="margin-top: 15px;">Based on your usage, optimal provider will appear after calculation.</p>
+          <p id="aiPrediction" style="margin-top:10px; color:#FACC15;"></p>
+          <p id="switchAdvice" style="margin-top:10px; padding: 10px; background: #0F172A; border-radius: 16px;"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL-TIME DASHBOARD -->
+  <section id="dashboard">
+    <div class="container">
+      <h2>📡 Real-Time Energy Dashboard</h2>
+      <p style="margin-bottom: 1rem; color:#94A3B8;">Live energy consumption and cost trends</p>
+      <div class="chart-container"><canvas id="energyUsageChart"></canvas></div>
+      <div class="chart-container"><canvas id="costTrendChart"></canvas></div>
+      <div class="flex-between" style="margin-top:10px; background:#1E293B; padding: 1rem; border-radius: 20px;">
+        <span><i class="fas fa-solar-panel" style="color:#FACC15;"></i> Solar: <strong id="solarValue">0</strong> kW</span>
+        <span><i class="fas fa-wind" style="color:#3B82F6;"></i> Wind: <strong id="windValue">0</strong> kW</span>
+        <span><i class="fas fa-charging-station" style="color:#22C55E;"></i> Grid: <strong id="gridValue">0</strong> kW</span>
+        <span><i class="fas fa-leaf" style="color:#22C55E;"></i> Renewable %: <strong id="renewablePercent">0</strong>%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARE & SHOP SECTION -->
+  <section id="shop">
+    <div class="container">
+      <h2>🛒 Compare & Select Cloud Instances</h2>
+      <p style="margin-bottom: 1rem; color:#94A3B8;">Select cloud services to compare pricing and features</p>
+      <div class="grid-3" id="serviceCardsContainer"></div>
+      <div id="comparisonPanel" style="margin-top: 2rem; background:#1E293B; border-radius: 28px; padding: 1.5rem;">
+        <h3>📊 Comparison Panel <span id="selectedCount" class="info-badge" style="background:#22C55E;">0</span> selected</h3>
+        <div id="selectedServicesList" style="margin: 1rem 0;"></div>
+        <canvas id="comparisonGraph" style="max-height: 250px;"></canvas>
+        <p id="smartChoiceMsg" class="gradient-text" style="margin-top:1rem; font-weight: 600;"></p>
+      </div>
+      
+      <!-- Energy Marketplace -->
+      <h2 style="margin-top: 3rem;">🛍️ Energy Marketplace</h2>
+      <p style="margin-bottom: 1rem; color:#94A3B8;">Buy renewable energy credits and carbon offsets</p>
+      <div class="grid-4" id="marketplaceContainer"></div>
+    </div>
+  </section>
+
+  <!-- AI & SMART FEATURES -->
+  <section id="smart">
+    <div class="container">
+      <h2>🤖 AI & Smart Features</h2>
+      <div class="grid-3">
+        <div class="card-hover"><i class="fas fa-robot fa-2x" style="color:#22C55E;"></i><h3>AI Cost Prediction</h3><p>Next month forecast: <strong id="forecastPrediction">$124.50</strong></p><p id="forecastInr" style="font-size:0.8rem; color:#94A3B8;"></p></div>
+        <div class="card-hover"><i class="fas fa-lightbulb fa-2x" style="color:#FACC15;"></i><h3>Smart Recommendations</h3><p id="smartRecommendation">Analyzing usage patterns...</p></div>
+        <div class="card-hover"><i class="fas fa-charging-station fa-2x" style="color:#3B82F6;"></i><h3>ML Concept</h3><p>Reinforcement learning optimizes cloud spend based on historical patterns.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- IoT Renewable Integration -->
+  <section id="iot">
+    <div class="container">
+      <h2>🌤️ IoT Renewable Integration</h2>
+      <p style="margin-bottom: 1rem; color:#94A3B8;">Real-time weather data from OpenWeather API</p>
+      <div class="flex-between" style="background:#1E293B; border-radius: 28px; padding: 1.5rem; flex-wrap:wrap; gap:15px;">
+        <div><i class="fas fa-temperature-low"></i> Temp: <strong id="weatherTemp">--</strong>°C</div>
+        <div><i class="fas fa-sun"></i> Sunlight: <strong id="sunlight">--</strong> lux</div>
+        <div><i class="fas fa-wind"></i> Wind: <strong id="windSpeed">--</strong> m/s</div>
+        <div><i class="fas fa-solar-panel"></i> Solar Eff: <strong id="solarEff">--</strong>%</div>
+        <div><i class="fas fa-fan"></i> Wind Energy: <strong id="windGen">--</strong> kW</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Carbon Footprint Tracker -->
+  <section id="carbon">
+    <div class="container">
+      <h2>🌱 Carbon Footprint Tracker</h2>
+      <p style="margin-bottom: 1rem; color:#94A3B8;">Track your carbon savings and green score</p>
+      <div style="display: flex; gap: 2rem; align-items:center; flex-wrap:wrap;">
+        <div style="position:relative; width:180px; height:180px;"><canvas id="carbonCircle"></canvas><div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;"><span id="co2Saved" style="font-size:1.5rem; font-weight:bold;">1240</span><br>kg CO₂</div></div>
+        <div style="flex:1"><span style="font-size:3rem; font-weight:bold;" id="greenScore">85</span><span>/100 Green Score</span><progress id="greenProgress" value="85" max="100" style="width:100%; height:12px; border-radius:10px; margin-top:10px;"></progress><p style="margin-top:10px;"><i class="fas fa-tree"></i> Equivalent to planting <span id="treesEquivalent">18</span> trees</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL-LIFE CASE STUDIES -->
+  <section id="cases">
+    <div class="container">
+      <h2>📚 Real‑Life Case Studies</h2>
+      <div class="grid-3">
+        <div class="card-hover"><i class="fas fa-solar-panel fa-2x" style="color:#FACC15;"></i><h3>Solar Plant Monitoring</h3><p>15% cost reduction via AWS IoT analytics</p><span class="info-badge">Success Story</span></div>
+        <div class="card-hover"><i class="fas fa-chart-line fa-2x" style="color:#22C55E;"></i><h3>Wind Energy Prediction</h3><p>GCP AI improved accuracy by 28%</p><span class="info-badge">AI Driven</span></div>
+        <div class="card-hover"><i class="fas fa-leaf fa-2x" style="color:#3B82F6;"></i><h3>Smart Grid Integration</h3><p>Azure IoT reduces emissions by 40%</p><span class="info-badge">IoT Enabled</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FUTURE SCOPE -->
+  <section id="future">
+    <div class="container">
+      <h2>🚀 Future Scope</h2>
+      <div class="grid-4">
+        <div class="card-hover" style="text-align: center;"><i class="fas fa-brain fa-2x" style="color:#22C55E;"></i><p style="margin-top:10px;">Advanced AI Integration</p></div>
+        <div class="card-hover" style="text-align: center;"><i class="fas fa-charging-station fa-2x" style="color:#FACC15;"></i><p style="margin-top:10px;">Smart Grid Integration</p></div>
+        <div class="card-hover" style="text-align: center;"><i class="fas fa-mobile-alt fa-2x" style="color:#3B82F6;"></i><p style="margin-top:10px;">Mobile App Development</p></div>
+        <div class="card-hover" style="text-align: center;"><i class="fas fa-store fa-2x" style="color:#22C55E;"></i><p style="margin-top:10px;">Global Energy Marketplace</p></div>
+        <div class="card-hover" style="text-align: center;"><i class="fas fa-chart-line fa-2x" style="color:#FACC15;"></i><p style="margin-top:10px;">Real-time Carbon Tracking</p></div>
+        <div class="card-hover" style="text-align: center;"><i class="fas fa-link fa-2x" style="color:#3B82F6;"></i><p style="margin-top:10px;">Blockchain Energy Trading</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REPORT EXPORT -->
+  <section>
+    <div class="container" style="text-align:center;">
+      <button id="downloadReportBtn" class="btn-glow"><i class="fas fa-download"></i> Download Detailed Report</button>
+    </div>
+  </section>
+
+  <footer>
+    <p>🌿 <strong>EcoCloud</strong> – Sustainable Energy Optimization Platform</p>
+    <p style="font-size: 0.8rem; margin-top: 10px;">Real‑time weather data • AI-powered insights • Carbon tracking • USD/INR conversion</p>
+  </footer>
+</div>
+
+<div class="scroll-top" id="scrollTop">
+  <i class="fas fa-arrow-up"></i>
+</div>
+
+<script>
+  // Exchange rate
+  let usdToInr = 83.50;
+  let showInr = false;
+  
+  // Cloud data
+  let cloudData = { 
+    aws: { compute: 0.085, storage: 0.023, scalability: 98, performance: 95, name: "AWS", sustainability: 85 },
+    azure: { compute: 0.092, storage: 0.021, scalability: 96, performance: 93, name: "Azure", sustainability: 82 },
+    gcp: { compute: 0.079, storage: 0.019, scalability: 97, performance: 94, name: "GCP", sustainability: 90 }
+  };
+  
+  let selectedServices = [];
+  let priceChart, perfChart, energyChart, costTrendChart, compareChart, carbonDoughnut;
+
+  function convertToInr(usdAmount) { return (usdAmount * usdToInr).toFixed(2); }
+  function formatCurrency(usdAmount) { return showInr ? `₹${convertToInr(usdAmount)}` : `$${usdAmount.toFixed(3)}`; }
+
+  function updateCurrencyDisplay() {
+    let symbol = showInr ? '₹' : '$';
+    document.getElementById('currencySymbol').innerHTML = symbol;
+    document.getElementById('computeCurr').innerHTML = symbol;
+    document.getElementById('storageCurr').innerHTML = symbol;
+    document.getElementById('currencyToggle').innerHTML = showInr ? '💱 INR → USD' : '💱 USD → INR';
+    updateComparisonUI();
+    calculateCosts();
+    buildShopCards();
+    buildMarketplace();
+    updateComparePanel();
+  }
+
+  function updateComparisonUI(filterType = null) {
+    let providers = Object.keys(cloudData);
+    if(filterType === 'cheapest') providers.sort((a,b)=> (cloudData[a].compute+cloudData[a].storage/100) - (cloudData[b].compute+cloudData[b].storage/100));
+    if(filterType === 'performance') providers.sort((a,b)=> cloudData[b].performance - cloudData[a].performance);
+    
+    let html = '';
+    providers.forEach(p => {
+      let d = cloudData[p];
+      html += `<tr><td><i class="fab fa-${p === 'aws' ? 'aws' : (p==='azure'?'microsoft':'google')}"></i> ${d.name}</td><td>${formatCurrency(d.compute)}/hr</td><td>${formatCurrency(d.storage)}/GB</td><td>${d.scalability}%</td><td>${d.performance}%</td><td>${d.sustainability}%</td></tr>`;
+    });
+    document.getElementById('tableBody').innerHTML = html;
+    
+    let labels = providers.map(p=>cloudData[p].name);
+    let computePrices = providers.map(p=>cloudData[p].compute);
+    let perfValues = providers.map(p=>cloudData[p].performance);
+    
+    if(priceChart) priceChart.destroy();
+    if(perfChart) perfChart.destroy();
+    
+    let priceData = showInr ? computePrices.map(p => p * usdToInr) : computePrices;
+    priceChart = new Chart(document.getElementById('priceChart'), { type:'bar', data:{ labels, datasets:[{label: showInr ? 'Compute Price (₹/hr)' : 'Compute Price ($/hr)', data:priceData, backgroundColor:'#22C55E', borderRadius:8}] } });
+    perfChart = new Chart(document.getElementById('performanceChart'), { type:'line', data:{ labels, datasets:[{label:'Performance Score', data:perfValues, borderColor:'#3B82F6', tension:0.3, fill:false}] } });
+  }
+
+  function calculateCosts() {
+    let storage = parseFloat(document.getElementById('storageInput').value) || 500;
+    let computeHrs = parseFloat(document.getElementById('computeInput').value) || 300;
+    let costs = { 
+      aws: storage*cloudData.aws.storage + computeHrs*cloudData.aws.compute,
+      azure: storage*cloudData.azure.storage + computeHrs*cloudData.azure.compute,
+      gcp: storage*cloudData.gcp.storage + computeHrs*cloudData.gcp.compute
+    };
+    let best = Object.keys(costs).reduce((a,b)=> costs[a]<costs[b]?a:b);
+    
+    document.getElementById('costResult').innerHTML = showInr ? 
+      `💰 AWS: ₹${convertToInr(costs.aws)} | Azure: ₹${convertToInr(costs.azure)} | GCP: ₹${convertToInr(costs.gcp)}` :
+      `💰 AWS: $${costs.aws.toFixed(2)} | Azure: $${costs.azure.toFixed(2)} | GCP: $${costs.gcp.toFixed(2)}`;
+    
+    document.getElementById('bestProviderSuggestion').innerHTML = `🏆 Best provider: ${cloudData[best].name} with ${formatCurrency(costs[best])}`;
+    document.getElementById('aiMsg').innerHTML = `AI recommends ${cloudData[best].name} – expected savings ${formatCurrency(Math.max(...Object.values(costs))-costs[best])}`;
+    document.getElementById('aiPrediction').innerHTML = `📈 Next month: ${formatCurrency(costs[best]*1.08)} (8% growth expected)`;
+    document.getElementById('forecastPrediction').innerHTML = formatCurrency(costs[best]*1.08);
+    document.getElementById('forecastInr').innerHTML = showInr ? '' : `(₹${convertToInr(costs[best]*1.08)} in INR)`;
+    
+    let switchMsg = (best !== 'aws') ? "💡 Switch to " + cloudData[best].name + " for better savings!" : "✅ You're using the optimal provider!";
+    document.getElementById('switchAdvice').innerHTML = switchMsg;
+    document.getElementById('inrConversion').innerHTML = showInr ? '' : `💱 In INR: AWS ₹${convertToInr(costs.aws)} | Azure ₹${convertToInr(costs.azure)} | GCP ₹${convertToInr(costs.gcp)}`;
+    
+    let recommendation = computeHrs > 500 ? "High compute usage detected. Consider reserved instances for up to 40% savings." : storage > 1000 ? "Large storage footprint. Consider archival storage tiers." : "Your usage pattern is optimal. Monitor regularly for savings.";
+    document.getElementById('smartRecommendation').innerHTML = recommendation;
+    return costs;
+  }
+
+  function buildMarketplace() {
+    let container = document.getElementById('marketplaceContainer');
+    let products = [
+      { name: "Solar Credits", price: 0.05, unit: "kWh", icon: "fa-solar-panel", seller: "GreenEnergy Co." },
+      { name: "Wind Energy", price: 0.04, unit: "kWh", icon: "fa-wind", seller: "EcoWind Ltd." },
+      { name: "Carbon Offsets", price: 12, unit: "ton", icon: "fa-leaf", seller: "CarbonZero" },
+      { name: "Renewable Certificates", price: 25, unit: "MWh", icon: "fa-certificate", seller: "GreenCert" }
+    ];
+    container.innerHTML = '';
+    products.forEach(p => {
+      let priceDisplay = showInr ? `₹${(p.price * usdToInr).toFixed(2)}` : `$${p.price}`;
+      let card = document.createElement('div');
+      card.className = 'marketplace-card';
+      card.innerHTML = `<i class="fas ${p.icon}" style="font-size: 2rem; color:#22C55E;"></i><h3 style="margin: 10px 0">${p.name}</h3><p><strong>${priceDisplay}</strong>/${p.unit}</p><p style="font-size: 0.8rem; color:#94A3B8;">Seller: ${p.seller}</p><button class="btn-glow" style="padding: 8px 16px; margin-top: 10px;" onclick="alert('✅ Demo: Purchased ${p.name} - This is a simulation for demonstration purposes.')">Purchase</button>`;
+      container.appendChild(card);
+    });
+  }
+
+  function buildShopCards() {
+    let container = document.getElementById('serviceCardsContainer');
+    let services = [
+      {name:"AWS EC2", provider:"aws", price:0.085, features:"High scalability, 99.9% uptime, 25 regions"},
+      {name:"Azure VM", provider:"azure", price:0.092, features:"Hybrid options, security, 60+ regions"},
+      {name:"GCP Compute", provider:"gcp", price:0.079, features:"Sustained use discount, carbon neutral"}
+    ];
+    container.innerHTML = '';
+    services.forEach(s=>{
+      let card = document.createElement('div');
+      card.className = 'card-hover'; card.style.padding='1.5rem';
+      card.innerHTML = `<i class="fas fa-server fa-2x" style="color:#22C55E"></i><h3 style="margin:10px 0">${s.name}</h3><p>${s.features}</p><p><strong>${formatCurrency(s.price)}/hr</strong></p><button class="btn-glow select-service" data-provider="${s.provider}" data-name="${s.name}" data-price="${s.price}" style="padding:8px 16px; margin-top:12px;">Select</button>`;
+      container.appendChild(card);
+    });
+    document.querySelectorAll('.select-service').forEach(btn => btn.addEventListener('click', (e) => {
+      let prov = btn.dataset.provider; let nm = btn.dataset.name; let pr = parseFloat(btn.dataset.price);
+      if(!selectedServices.find(s=>s.name===nm)) selectedServices.push({name:nm, provider:prov, price:pr});
+      updateComparePanel();
+    }));
+  }
+
+  function updateComparePanel() {
+    document.getElementById('selectedCount').innerHTML = selectedServices.length;
+    let listHtml = '<div style="display:flex; flex-wrap:wrap; gap:10px;">';
+    selectedServices.forEach(s=>{ 
+      listHtml+=`<span style="background:#0F172A; padding:8px 16px; border-radius:40px;">${s.name} - ${formatCurrency(s.price)}/hr <button class="removeSel" data-n="${s.name}" style="background:none; border:none; color:#FACC15; cursor:pointer;">❌</button></span>`;
+    });
+    listHtml+= '</div>';
+    document.getElementById('selectedServicesList').innerHTML = listHtml;
+    if(compareChart) compareChart.destroy();
+    let labels = selectedServices.map(s=>s.name);
+    let prices = showInr ? selectedServices.map(s=>s.price * usdToInr) : selectedServices.map(s=>s.price);
+    let ctx = document.getElementById('comparisonGraph').getContext('2d');
+    compareChart = new Chart(ctx, { type:'bar', data:{ labels, datasets:[{label: showInr ? 'Hourly Cost (₹)' : 'Hourly Cost (USD)', data:prices, backgroundColor:'#FACC15', borderRadius:8}] } });
+    if(selectedServices.length) {
+      let bestSel = selectedServices.reduce((a,b)=> a.price<b.price ? a:b);
+      document.getElementById('smartChoiceMsg').innerHTML = `✨ Best choice: ${bestSel.name} (${formatCurrency(bestSel.price)}/hr)`;
+    } else document.getElementById('smartChoiceMsg').innerHTML = 'Select services to compare';
+    document.querySelectorAll('.removeSel').forEach(btn=> btn.addEventListener('click',(e)=>{
+      let nameDel = btn.dataset.n;
+      selectedServices = selectedServices.filter(s=>s.name !== nameDel);
+      updateComparePanel();
+    }));
+  }
+
+  async function fetchWeatherAndRenewables() {
+    try {
+      const apiKey = 'b1b15e88fa797225412429c1c50c122a';
+      const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=London&appid=${apiKey}&units=metric`);
+      if(!res.ok) throw new Error();
+      const data = await res.json();
+      document.getElementById('weatherTemp').innerHTML = data.main.temp.toFixed(1);
+      document.getElementById('windSpeed').innerHTML = data.wind.speed.toFixed(1);
+      let clouds = data.clouds.all;
+      let sunlight = Math.max(100, 950 - (clouds * 7));
+      document.getElementById('sunlight').innerHTML = Math.floor(sunlight);
+      let solarEff = Math.min(94, Math.floor(30 + (sunlight/1000)*60));
+      let windGen = Math.min(48, Math.floor(data.wind.speed * 3.8));
+      document.getElementById('solarEff').innerHTML = solarEff;
+      document.getElementById('windGen').innerHTML = windGen;
+      document.getElementById('solarValue').innerHTML = solarEff;
+      document.getElementById('windValue').innerHTML = windGen;
+      document.getElementById('gridValue').innerHTML = Math.floor(40 + Math.random() * 30);
+      let renewablePercent = Math.floor(((solarEff + windGen) / 150) * 100);
+      document.getElementById('renewablePercent').innerHTML = renewablePercent;
+    } catch(e) {
+      document.getElementById('weatherTemp').innerHTML = (22+Math.floor(Math.random()*6));
+      document.getElementById('windSpeed').innerHTML = (3.5+Math.random()*4).toFixed(1);
+      document.getElementById('sunlight').innerHTML = 680;
+      document.getElementById('solarEff').innerHTML = 71;
+      document.getElementById('windGen').innerHTML = 31;
+      document.getElementById('solarValue').innerHTML = 71;
+      document.getElementById('windValue').innerHTML = 31;
+      document.getElementById('gridValue').innerHTML = 55;
+      document.getElementById('renewablePercent').innerHTML = 65;
+    }
+  }
+
+  let energyDataPoints = [44,48,52,57,61,64,60];
+  let costTrendPoints = [85,90,87,93,99,96,102];
+  
+  function initTrendCharts() {
+    let ctxEng = document.getElementById('energyUsageChart').getContext('2d');
+    let ctxCost = document.getElementById('costTrendChart').getContext('2d');
+    energyChart = new Chart(ctxEng, { type:'line', data:{ labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], datasets:[{label:'Energy (MWh)', data:energyDataPoints, borderColor:'#22C55E', backgroundColor:'rgba(34,197,94,0.1)', fill:true, tension:0.3}] } });
+    costTrendChart = new Chart(ctxCost, { type:'line', data:{ labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], datasets:[{label:'Cost (USD)', data:costTrendPoints, borderColor:'#FACC15', fill:false, tension:0.3}] } });
+    setInterval(()=>{
+      let newVal = energyDataPoints[energyDataPoints.length-1] + (Math.random()*5 -2.5);
+      energyDataPoints.push(Math.max(35, newVal)); energyDataPoints.shift();
+      energyChart.data.datasets[0].data = energyDataPoints; energyChart.update();
+      let newCost = costTrendPoints[costTrendPoints.length-1] + (Math.random()*7 -3);
+      costTrendPoints.push(Math.max(75, newCost)); costTrendPoints.shift();
+      costTrendChart.data.datasets[0].data = costTrendPoints; costTrendChart.update();
+    }, 6000);
+  }
+
+  function initCarbonCircle() {
+    let ctx = document.getElementById('carbonCircle').getContext('2d');
+    carbonDoughnut = new Chart(ctx, { type:'doughnut', data:{ labels:['CO₂ Saved','Remaining'], datasets:[{data:[1240, 760], backgroundColor:['#22C55E','#334155'], borderWidth:0}] } });
+    let greenScoreVal = 85;
+    setInterval(()=>{
+      let inc = Math.floor(Math.random()*4);
+      greenScoreVal = Math.min(99, greenScoreVal+inc);
+      document.getElementById('greenScore').innerHTML = greenScoreVal;
+      document.getElementById('greenProgress').value = greenScoreVal;
+      let newSaved = 1240 + inc*6;
+      document.getElementById('co2Saved').innerHTML = newSaved;
+      document.getElementById('treesEquivalent').innerHTML = Math.floor(newSaved / 70);
+      carbonDoughnut.data.datasets[0].data = [newSaved, 2000 - newSaved];
+      carbonDoughnut.update();
+    }, 9000);
+  }
+
+  function initParticles() {
+    let canvas = document.getElementById('particleCanvas');
+    let ctx = canvas.getContext('2d');
+    function resizeCanvas(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resizeCanvas(); window.addEventListener('resize',resizeCanvas);
+    let particles = [];
+    for(let i=0;i<80;i++) particles.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*2+1, alpha:Math.random()*0.6});
+    function drawParticles(){ 
+      ctx.clearRect(0,0,canvas.width,canvas.height); 
+      particles.forEach(p=>{ 
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); 
+        ctx.fillStyle=`rgba(34,197,94,${p.alpha*0.4})`; 
+        ctx.fill(); 
+        p.y += 0.3; 
+        if(p.y>canvas.height) p.y=0; 
+      }); 
+      requestAnimationFrame(drawParticles); 
+    }
+    drawParticles();
+  }
+
+  // Mobile menu functionality
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const menuOverlay = document.getElementById('menuOverlay');
+  
+  function toggleMenu() {
+    hamburger.classList.toggle('active');
+    mobileMenu.classList.toggle('active');
+    menuOverlay.classList.toggle('active');
+    document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+  }
+  
+  hamburger.addEventListener('click', toggleMenu);
+  menuOverlay.addEventListener('click', toggleMenu);
+  
+  // Close menu when clicking a link
+  document.querySelectorAll('.mobile-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      toggleMenu();
+      document.querySelectorAll('.nav-links a, .mobile-menu a').forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+  
+  // Active link highlighting on scroll
+  window.addEventListener('scroll', () => {
+    let scrollPos = window.scrollY + 100;
+    document.querySelectorAll('section').forEach(section => {
+      let id = section.getAttribute('id');
+      if(id && section.offsetTop <= scrollPos && section.offsetTop + section.offsetHeight > scrollPos) {
+        document.querySelectorAll('.nav-links a, .mobile-menu a').forEach(link => {
+          link.classList.remove('active');
+          if(link.getAttribute('href') === '#' + id) link.classList.add('active');
+        });
+      }
+    });
+    
+    // Scroll to top button
+    let scrollTop = document.getElementById('scrollTop');
+    if(window.scrollY > 300) scrollTop.classList.add('show');
+    else scrollTop.classList.remove('show');
+  });
+  
+  document.getElementById('scrollTop').addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+
+  // Initialize
+  window.onload = () => {
+    setTimeout(()=>{
+      let loader = document.getElementById('loader');
+      loader.style.opacity = '0';
+      setTimeout(()=>{ loader.style.display = 'none'; document.getElementById('mainContent').style.opacity='1'; }, 500);
+    }, 2000);
+    
+    updateComparisonUI();
+    buildShopCards();
+    buildMarketplace();
+    calculateCosts();
+    fetchWeatherAndRenewables();
+    setInterval(fetchWeatherAndRenewables, 45000);
+    initTrendCharts();
+    initCarbonCircle();
+    initParticles();
+    
+    document.getElementById('calcBtn').addEventListener('click', calculateCosts);
+    document.getElementById('filterCheapest').addEventListener('click',()=>updateComparisonUI('cheapest'));
+    document.getElementById('filterBestPerf').addEventListener('click',()=>updateComparisonUI('performance'));
+    document.getElementById('exploreBtn').addEventListener('click',()=>document.getElementById('comparison').scrollIntoView({behavior:'smooth'}));
+    document.getElementById('currencyToggle').addEventListener('click', () => { showInr = !showInr; updateCurrencyDisplay(); buildShopCards(); buildMarketplace(); updateComparePanel(); calculateCosts(); });
+    document.getElementById('downloadReportBtn').addEventListener('click',()=> alert("📄 EcoCloud Report Generated!\n\n✅ Cloud Cost Analysis Complete\n✅ Carbon Savings: " + document.getElementById('co2Saved').innerText + " kg CO₂\n✅ Green Score: " + document.getElementById('greenScore').innerText + "/100\n✅ AI Recommendations Included\n✅ Currency: " + (showInr ? "INR" : "USD") + "\n\nThank you for using EcoCloud!"));
+  };
+</script>
+</body>
+</html>

@@ -1,1 +1,2 @@
-# -Comparison-of-Cloud-Cost-Software-
+# Eco Cloud Platform
+Simple project structure

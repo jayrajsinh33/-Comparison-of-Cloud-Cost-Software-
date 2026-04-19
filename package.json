@@ -1,0 +1,18 @@
+{
+  "name": "eco-cloud-platform",
+  "version": "1.0.0",
+  "description": "Cloud-Based Sustainable Energy Cost Optimization System",
+  "main": "frontend/index.html",
+  "scripts": {
+    "start": "npx live-server frontend --port=5500 --no-browser",
+    "dev": "npx live-server frontend --port=5500 --open",
+    "serve": "npx http-server frontend -p 5500"
+  },
+  "keywords": ["sustainable", "energy", "cloud", "optimization"],
+  "author": "EcoCloud Team",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "http-server": "^14.1.1"
+  }
+}
